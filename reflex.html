@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REFLEX — Where Attention Builds</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --paper: #fffff8;
+            --dark-paper: #f8f8f0;
+            --ink: #1a1a1a;
+            --red: #cc0000;
+            --green: #006600;
+            --blue: #000099;
+            --gray: #666666;
+            --light-gray: #999999;
+            
+            --serif: 'EB Garamond', serif;
+            --mono: 'IBM Plex Mono', monospace;
+        }
+        
+        /* Grid layouts */
+        .grid-4col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .grid-3col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 800px) {
+            .grid-4col, .grid-3col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .grid-4col, .grid-3col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        body {
+            font-family: var(--serif);
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            font-size: 18px;
+        }
+
+        ::selection {
+            background: var(--green);
+            color: var(--paper);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 248, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: var(--mono);
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--ink);
+        }
+
+        .nav-logo span {
+            color: var(--green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-decoration: none;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--green);
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .wide-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+
+        .hero-label {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            color: var(--gray);
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .mode-btn {
+            padding: 0.75rem 1.5rem;
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: 2px solid var(--ink);
+            color: var(--ink);
+            background: none;
+            cursor: pointer;
+        }
+
+        .mode-btn.active {
+            background: var(--green);
+            color: var(--paper);
+            border-color: var(--green);
+        }
+
+        /* Mode Content */
+        .summary-content, .spx-content {
+            display: none;
+        }
+
+        body.summary-mode .story-content {
+            display: none;
+        }
+
+        body.summary-mode .summary-content {
+            display: block;
+        }
+
+        body.summary-mode .chapter {
+            display: none;
+        }
+
+        body.spx-mode .story-content {
+            display: none;
+        }
+
+        body.spx-mode .summary-content {
+            display: none;
+        }
+
+        body.spx-mode .spx-content {
+            display: block;
+        }
+
+        body.spx-mode .chapter {
+            display: none;
+        }
+
+        /* Summary Main Container */
+        .summary-main {
+            padding: 80px 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .summary-section {
+            background: var(--paper);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--green);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-section h3 {
+            font-family: var(--mono);
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .summary-section p {
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+            line-height: 1.6;
+            color: var(--ink);
+        }
+
+        .summary-section strong {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .summary-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        .summary-list li:last-child {
+            border-bottom: none;
+        }
+
+        .summary-highlight {
+            background: rgba(0, 102, 0, 0.1);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            font-style: italic;
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+        /* Mechanism Grid */
+        .mechanism-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .mechanism-step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--green);
+            color: var(--paper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 500;
+            margin: 0 auto 1rem;
+        }
+
+        .mechanism-step h4 {
+            font-family: var(--mono);
+            font-size: 1rem;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .mechanism-step p {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Evolution Grid */
+        .evolution-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .evolution-phase {
+            background: var(--dark-paper);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .evolution-phase::after {
+            content: '→';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--green);
+        }
+
+        .evolution-phase:last-child::after {
+            display: none;
+        }
+
+        .evolution-phase h4 {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .evolution-phase p {
+            font-size: 0.875rem;
+            color: var(--ink);
+            margin: 0;
+        }
+
+
+
+        /* Tech Note */
+        .tech-note {
+            font-style: italic;
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        /* Chapter Sections */
+        .chapter {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .chapter:nth-child(even) {
+            background: var(--dark-paper);
+        }
+
+        .chapter-header {
+            margin-bottom: 3rem;
+        }
+
+        .chapter-number {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            color: var(--green);
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .chapter-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .chapter-intro {
+            font-size: 1.25rem;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Content Typography */
+        p {
+            margin-bottom: 1.5rem;
+        }
+
+        .data {
+            font-family: var(--mono);
+            font-size: 0.875em;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .data.red { color: var(--red); }
+        .data.green { color: var(--green); }
+        .data.blue { color: var(--blue); }
+
+        /* Images */
+        .image-container {
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-caption {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--paper);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-family: var(--mono);
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+        }
+
+        /* Visual Diagrams */
+        .diagram {
+            margin: 4rem 0;
+            padding: 3rem;
+            background: var(--dark-paper);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .diagram-title {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Quote Blocks */
+        .quote {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(0, 102, 0, 0.03);
+            border-left: 3px solid var(--green);
+            font-style: italic;
+            font-size: 1.125rem;
+        }
+
+        .quote-attribution {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 1rem;
+            font-style: normal;
+        }
+
+        /* Technical Architecture */
+        .architecture {
+            background: var(--dark-paper);
+            color: var(--ink);
+            padding: 80px 0;
+        }
+
+        .architecture .chapter-number {
+            color: var(--green);
+        }
+
+        .architecture .chapter-title {
+            color: var(--ink);
+        }
+
+        .architecture .chapter-intro {
+            color: var(--gray);
+        }
+
+        .architecture p {
+            color: var(--ink);
+        }
+
+        .code-block {
+            background: var(--ink);
+            color: var(--paper);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-block .comment {
+            color: #90EE90;
+        }
+
+        /* Fee Flow Diagram */
+        .fee-flow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .fee-component {
+            text-align: center;
+            padding: 2rem;
+            background: var(--paper);
+            border: 2px solid var(--green);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .fee-percentage {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+
+        .fee-label {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+        }
+
+        .fee-desc {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            color: var(--gray);
+        }
+
+        /* Mission Examples */
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .mission-card {
+            padding: 2rem;
+            background: var(--paper);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .mission-card:hover {
+            border-color: var(--green);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-token {
+            font-family: var(--mono);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+
+        .mission-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .mission-desc {
+            font-size: 0.925rem;
+            line-height: 1.6;
+            color: var(--ink);
+        }
+
+        /* Work Opportunities Grid */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .work-card {
+            padding: 1.5rem;
+            background: var(--paper);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .work-card:hover {
+            border-color: var(--green);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .work-role {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--green);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .work-desc {
+            font-size: 0.875rem;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            text-align: center;
+            background: var(--dark-paper);
+        }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .cta-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: var(--paper);
+        }
+
+        .btn-primary:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--ink);
+            color: var(--ink);
+        }
+
+        .btn-secondary:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-text {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--gray);
+            letter-spacing: 0.05em;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .chapter-title {
+                font-size: 2rem;
+            }
+
+            .fee-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .missions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .mode-toggle {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .mode-btn {
+                width: 200px;
+            }
+
+            .mechanism-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .evolution-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .evolution-phase::after {
+                display: none;
+            }
+
+
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+
+        /* Smooth transitions */
+        * {
+            transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Better link styling */
+        a {
+            color: var(--green);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        a:hover {
+            border-bottom-color: var(--green);
+        }
+
+
+        /* Case Study Styles */
+        .case-study-header {
+            background: var(--dark-paper);
+            padding: 3rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .case-study-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .case-study-subtitle {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            color: var(--gray);
+            letter-spacing: 0.05em;
+        }
+
+        .case-study-content {
+            padding: 3rem;
+        }
+
+        .act-section {
+            margin-bottom: 3rem;
+        }
+
+        .act-title {
+            font-family: var(--mono);
+            font-size: 1.25rem;
+            color: var(--green);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Results Table */
+        .results-table {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .results-table th {
+            background: var(--dark-paper);
+            padding: 1rem;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--green);
+        }
+
+        .results-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .results-table .highlight {
+            color: var(--green);
+            font-weight: 500;
+        }
+
+        .results-table .highlight-strong {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .table-note {
+            font-size: 0.875rem;
+            color: var(--gray);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        /* Payoff Grid */
+        .payoff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .payoff-item {
+            padding: 1.5rem;
+            background: var(--dark-paper);
+            border-radius: 8px;
+            border-left: 3px solid var(--green);
+        }
+
+        .payoff-summary {
+            font-size: 1.125rem;
+            font-style: italic;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Assumptions & Risks */
+        .assumptions-section, .risks-section, .tldr-section {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: var(--dark-paper);
+            border-radius: 8px;
+        }
+
+        .assumptions-section h4, .risks-section h4, .tldr-section h4 {
+            font-family: var(--mono);
+            font-size: 1rem;
+            color: var(--green);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .assumptions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .assumptions-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .assumptions-list li:last-child {
+            border-bottom: none;
+        }
+
+        .assumptions-note {
+            font-size: 0.875rem;
+            color: var(--gray);
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .tldr-section {
+            background: rgba(0, 102, 0, 0.05);
+            border-left: 3px solid var(--green);
+        }
+
+
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .case-study-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .case-study-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .case-study-title {
+                font-size: 1.75rem;
+            }
+
+            .results-table {
+                font-size: 0.875rem;
+            }
+
+            .results-table th, .results-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        /* Diagram improvements */
+        .diagram {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 102, 0, 0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            to {
+                left: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="nav-logo">REFLEX <span>FRAMEWORK</span></a>
+            <div class="nav-links">
+                <a href="#story" class="nav-link">STORY</a>
+                <a href="#mechanism" class="nav-link">MECHANISM</a>
+                <a href="#examples" class="nav-link">EXAMPLES</a>
+                <a href="https://sculpt.fun" target="_blank" class="nav-link" style="color: var(--green);">SCULPT</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <p class="hero-label fade-in">RESEARCH PROJECT BY SCULPT // SOLANA</p>
+            <h1 class="hero-title fade-in fade-in-delay-1">Where attention builds</h1>
+            <p class="hero-subtitle fade-in fade-in-delay-2">
+                Memecoins capture billions in attention. REFLEX makes it productive. 
+                Trade tokens, fund builders, burn supply on real progress.
+            </p>
+            
+            <!-- Mode Toggle -->
+            <div class="mode-toggle fade-in fade-in-delay-3">
+                <button class="mode-btn active" data-mode="story">STORY</button>
+                <button class="mode-btn" data-mode="summary">TLDR</button>
+                <button class="mode-btn" data-mode="spx">$SPX6900 x REFLEX</button>
+            </div>
+            
+            <div style="font-family: var(--serif); margin-top: 3rem; max-width: 80%; margin-left: auto; margin-right: auto; opacity: 0.9;" class="fade-in fade-in-delay-3">
+                <p style="text-align: center; font-style: italic; font-size: 1.1rem; margin-bottom: 1rem;">
+                    <span style="color: var(--green);">REFLEX is a research idea/thesis on mission-driven token economics</span>
+                </p>
+                <p style="text-align: center; font-size: 0.95rem;">
+                    This proposal explores how we might channel attention into meaningful work through token mechanics.
+                    We plan to test these concepts with an experimental implementation using manual fee routing,
+                    which could inform future ML-based approaches.
+                </p>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator fade-in fade-in-delay-3" style="margin-top: 4rem;">
+                <div style="font-family: var(--mono); font-size: 0.75rem; color: var(--gray); margin-bottom: 0.5rem;">EXPLORE</div>
+                <div style="animation: bounce 2s infinite;">↓</div>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+
+    <!-- Summary -->
+    <div class="summary-content">
+        <div class="container">
+            <div class="summary-main">
+                <!-- Core Mechanism -->
+                <div class="summary-section">
+                    <h3>The REFLEX Loop</h3>
+                    <div class="mechanism-grid">
+                        <div class="mechanism-step">
+                            <div class="step-number">1</div>
+                            <h4>Attention</h4>
+                            <p>Memecoins naturally attract traders, bots, and speculators</p>
+                        </div>
+                        <div class="mechanism-step">
+                            <div class="step-number">2</div>
+                            <h4>Trading</h4>
+                            <p>Every trade generates fees that fund the mission</p>
+                        </div>
+                        <div class="mechanism-step">
+                            <div class="step-number">3</div>
+                            <h4>Work</h4>
+                            <p>Fees dynamically route to rewards and mission work</p>
+                        </div>
+                        <div class="mechanism-step">
+                            <div class="step-number">4</div>
+                            <h4>Progress</h4>
+                            <p>KPIs hit → supply burns → routing evolves</p>
+                        </div>
+                        <div class="mechanism-step">
+                            <div class="step-number">5</div>
+                            <h4>Value</h4>
+                            <p>Scarcity + impact = sustainable growth</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Innovation -->
+                <div class="summary-section">
+                    <h3>Key Innovation</h3>
+                    <p><strong>Dynamic Fee Routing:</strong> Instead of fixed percentages, fees adapt based on mission progress. Early stages prioritize rewards to bootstrap participation. As KPIs are hit, routing evolves. Mature missions optimize for sustainability.</p>
+                    <p><strong>Flexible Framework:</strong> Community missions can run 100% on rewards. Organizations can maintain treasuries. Hybrid models can transition over time. The protocol adapts to each mission's needs.</p>
+                    <p><strong>Onchain Everything:</strong> All KPIs must be verifiable through smart contracts. This is hard but essential for trust and automation.</p>
+                </div>
+
+                <!-- Dynamic Framework -->
+                <div class="summary-section">
+                    <h3>Dynamic Fee Evolution</h3>
+                    <div class="evolution-grid">
+                        <div class="evolution-phase">
+                            <h4>Launch Phase</h4>
+                            <p>Heavy rewards to bootstrap participation</p>
+                        </div>
+                        <div class="evolution-phase">
+                            <h4>Growth Phase</h4>
+                            <p>Balance shifts as KPIs are hit</p>
+                        </div>
+                        <div class="evolution-phase">
+                            <h4>Mature Phase</h4>
+                            <p>Optimized for sustainability</p>
+                        </div>
+                    </div>
+                    <p class="tech-note">Fee routing adapts automatically based on KPI achievement. No fixed percentages—the protocol evolves with the mission.</p>
+                </div>
+
+                <!-- Mission Examples -->
+                <div class="summary-section">
+                    <h3>Example Missions</h3>
+                    <ul class="summary-list">
+                        <li><strong>$FACTORY:</strong> Make Solana the token factory. More tokens launched → more burns.</li>
+                        <li><strong>$SOLAR:</strong> Fund renewable energy. Each megawatt installed → supply reduction.</li>
+                        <li><strong>$CODE:</strong> Pay open source developers. Merged PRs → automatic burns.</li>
+                        <li><strong>$SHELTER:</strong> Dog coins save real dogs. Verified rescues → token deflation.</li>
+                    </ul>
+                    <p class="tech-note">Each mission defines its own KPIs, fee routing, and evolution path. The framework adapts.</p>
+                </div>
+
+                <!-- How You Earn -->
+                <div class="summary-section">
+                    <h3>How You Earn</h3>
+                    <p>REFLEX creates real work opportunities. Build tools, spread awareness, run infrastructure, create content—all contributions earn from the reward pool. The key: everything must be trackable onchain. When solved, this unlocks massive earning potential beyond just trading.</p>
+                </div>
+
+                <!-- Challenges -->
+                <div class="summary-section">
+                    <h3>Known Challenges</h3>
+                    <p><strong>Death Spiral:</strong> Price drops → less attention → fewer fees. Requires strong initial community and real utility.</p>
+                    <p><strong>Onchain Verification:</strong> Many real-world actions are hard to track onchain. We need better oracles.</p>
+                    <p><strong>Sustainable Economics:</strong> Most token economies fail. This framework improves odds but guarantees nothing.</p>
+                </div>
+
+                <div class="summary-highlight">
+                    <strong>REFLEX FRAMEWORK</strong><br>
+                    Turn speculation into construction. Channel attention into work. Build with reflexivity.
+                    <br><br>
+                    <em style="font-size: 0.9em;">Open source implementation on GitHub. Join the research.</em>
+                </div>
+
+                <div class="summary-section" style="border-color: var(--red); background: rgba(204, 0, 0, 0.03);">
+                    <h3 style="color: var(--red);">Critical Disclaimer</h3>
+                    <p>Token economies are experimental. Most fail. This framework improves odds but guarantees nothing. Always DYOR.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPX-6900 Case Study Content -->
+    <div class="spx-content">
+        <div class="container">
+            <div class="case-study-header" style="margin-top: 80px; max-width: 900px; margin-left: auto; margin-right: auto;">
+                <h2 class="case-study-title">From Hype to Fuel — SPX‑6900 meets REFLEX</h2>
+                <p class="case-study-subtitle">Story‑first case study · Sculpt // Solana · 11 June 2025</p>
+            </div>
+
+            <div class="case-study-content" style="max-width: 900px; margin: 0 auto;">
+                <!-- ACT I -->
+                <div class="act-section">
+                    <h3 class="act-title">ACT I — The Storm</h3>
+                    <p>
+                        Late 2023. <span class="data green">SPX‑6900</span> emerges as a tongue‑in‑cheek "S&P in your pocket" meme. 
+                        It rides Discord raids and TikTok stitches from <span class="data">$0.001</span> to <span class="data">$1+</span>, 
+                        pushing <span class="data red">$6.5B</span> through Solana DEXs in just 20 months. 
+                        Great eyeballs, zero productivity: every swap fee vanishes into thin air.
+                    </p>
+                </div>
+
+                <!-- ACT II -->
+                <div class="act-section">
+                    <h3 class="act-title">ACT II — The What‑If</h3>
+                    <p>
+                        What if the same frenzy had launched under REFLEX — a <span class="data green">2% swap fee</span> that automatically 
+                        burns tokens, deepens liquidity, and rewards contributors?
+                    </p>
+                    <p>
+                        We feed real monthly volume medians into a simple router model. 70% of trades stay in the taxed pool; 
+                        the fee splits <span class="data">35% burn / 35% LP / 30% rewards</span>.
+                    </p>
+
+                    <!-- Results Table -->
+                    <div class="results-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric (to 11 Jun 25)</th>
+                                    <th>No REFLEX</th>
+                                    <th>REFLEX (mechanics)</th>
+                                    <th>REFLEX (flywheel)*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tokens burned</td>
+                                    <td>0</td>
+                                    <td class="highlight">97M</td>
+                                    <td class="highlight-strong">167M</td>
+                                </tr>
+                                <tr>
+                                    <td>Circulating supply</td>
+                                    <td>931M</td>
+                                    <td>834M</td>
+                                    <td class="highlight">764M</td>
+                                </tr>
+                                <tr>
+                                    <td>Native LP depth</td>
+                                    <td>≈ $10M</td>
+                                    <td class="highlight">$42M</td>
+                                    <td class="highlight-strong">$72M</td>
+                                </tr>
+                                <tr>
+                                    <td>Rewards paid</td>
+                                    <td>0</td>
+                                    <td class="highlight">$32M</td>
+                                    <td class="highlight-strong">$55M</td>
+                                </tr>
+                                <tr>
+                                    <td>Spot price</td>
+                                    <td>$1.68</td>
+                                    <td class="highlight">$1.87</td>
+                                    <td class="highlight-strong">$2.05</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="table-note">*Flywheel lets deeper liquidity double future volume (elasticity from BONK/SAMO order‑books).</p>
+                    </div>
+                </div>
+
+                <!-- ACT III -->
+                <div class="act-section">
+                    <h3 class="act-title">ACT III — The Pay‑off</h3>
+                    <div class="payoff-grid">
+                        <div class="payoff-item">
+                            <strong>Supply shrinks 10‑18%</strong> — price climbs 11‑22% without fresh demand.
+                        </div>
+                        <div class="payoff-item">
+                            <strong>LP grows 4‑7×</strong> — whales trade without nuking the chart.
+                        </div>
+                        <div class="payoff-item">
+                            <strong>$30‑55M streams to the movement</strong> — spaces, literacy bounties, merch runs.
+                        </div>
+                    </div>
+                    <p class="payoff-summary">
+                        In short, the same swaps that already happen start paying the mission's bills and burning the float at once.
+                    </p>
+                </div>
+
+                <!-- Key Assumptions -->
+                <div class="assumptions-section">
+                    <h4>Key Assumptions (one‑liner style)</h4>
+                    <ul class="assumptions-list">
+                        <li>Volume = CoinGecko medians, month‑binned.</li>
+                        <li>70% of flow sticks to the taxed pool (standard Solana meme meta).</li>
+                        <li>Fee split glides 50/30/20 → 30/40/30 by 2025.</li>
+                        <li>Depth elasticity: 10× liquidity → 2× volume.</li>
+                    </ul>
+                    <p class="assumptions-note">
+                        <a href="https://github.com/sculptdotfun/reflex/blob/main/spx6900_reflex_case_study.ipynb" 
+                           target="_blank" 
+                           style="color: var(--green); border-bottom: 1px solid var(--green);">
+                            View full CSV + python notebook on GitHub →
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Risks -->
+                <div class="risks-section">
+                    <h4>Risks & Unknowns</h4>
+                    <p>Vampire pools · Elasticity guesswork · On‑chain KPI oracles — details inside the notebook code comments.</p>
+                </div>
+
+                <!-- TL;DR -->
+                <div class="tldr-section">
+                    <h4>TL;DR for SPX hodlers</h4>
+                    <p>
+                        Same hype, less supply, more runway. Swap fees become buy‑backs, liquidity, and contributor pay. 
+                        <strong>That's REFLEX.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 1: The Attention Economy -->
+    <section id="story" class="chapter">
+        <div class="container">
+            <!-- Story Content -->
+            <div class="story-content">
+                <div class="chapter-header">
+                    <p class="chapter-number">CHAPTER 1</p>
+                    <h2 class="chapter-title">The Attention Economy</h2>
+                    <p class="chapter-intro">
+                        Memecoins revealed a truth: attention is the scarcest resource in crypto. 
+                        What if we could make it productive?
+                    </p>
+                </div>
+
+                <p>
+                    Every memecoin is fundamentally an <span class="data green">attention vehicle</span>. They capture 
+                    eyeballs, create communities, generate excitement. But traditionally, this attention dissipates 
+                    into nothing—a brief pump, a crash, silence.
+                </p>
+
+                <p>
+                    The scale is significant. Billions flow through memecoins annually—not as traditional 
+                    investment, but as <span class="data green">monetized attention</span>. The challenge isn't 
+                    the speculation itself, but the lack of productive channels for this energy.
+                </p>
+
+
+
+                <p>
+                    Consider movements like Bryan Johnson's "Don't Die" philosophy. Imagine if that meme energy 
+                    could fund longevity research through a token. The attention is already there—millions follow 
+                    his biohacking journey. A token could channel that fascination into funding actual research. 
+                    <span class="data blue">Attention becomes action</span>.
+                </p>
+
+                <p>
+                    This is the breakthrough: <strong>memecoins are already perfect attention capture mechanisms</strong>. 
+                    We don't need to fix that. We need to give that attention somewhere productive to go. Work to fund. 
+                    Impact to create. Value to build.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 2: The Mechanism -->
+    <section id="mechanism" class="chapter">
+        <div class="container">
+            <div class="story-content">
+                <div class="chapter-header">
+                    <p class="chapter-number">CHAPTER 2</p>
+                    <h2 class="chapter-title">The Reflexive Loop</h2>
+                    <p class="chapter-intro">
+                        Traditional reflexivity destroys. REFLEX reflexivity builds. 
+                        The difference is where the energy goes.
+                    </p>
+                </div>
+
+                <p>
+                    Here's the opportunity: tokens with sufficient <span class="data green">liquidity and utility</span> 
+                    attract continuous trading activity. Market makers provide liquidity. Arbitrage bots capture price 
+                    inefficiencies. Active traders generate volume. This creates ongoing fee generation—but only if 
+                    the token maintains relevance and liquidity.
+                </p>
+
+                <p>
+                    Most protocols waste these fees. REFLEX captures them for missions AND rewards users. 
+                    Every trade funds work and fills the reward pool. Users who participate—contributing to missions, 
+                    spreading awareness, building tools—earn points and claim their share of fees. 
+                    <strong>You get paid to make the mission succeed</strong>.
+                </p>
+
+                <div class="diagram">
+                    <p class="diagram-title">THE REFLEX LOOP</p>
+                    <div style="text-align: center; font-size: 1.25rem; line-height: 2;">
+                        Attention → Trading → Fees → Work + Rewards → KPIs → Burns → Price → More Attention
+                    </div>
+                    <p style="text-align: center; margin-top: 1rem; font-style: italic; color: var(--gray);">
+                        Users earn rewards for contributing to missions and driving engagement
+                    </p>
+                </div>
+
+                <p>
+                    The genius is in the flexibility. <span class="data green">Community missions</span> can run 
+                    with zero treasury—all fees reward participants. <span class="data blue">Organization missions</span> 
+                    can maintain treasuries for research and operations. The protocol adapts to each mission's needs, 
+                    evolving as KPIs are hit and communities grow.
+                </p>
+
+                <p>
+                    This addresses crypto's fundamental paradox: speculation usually destroys building. Here, 
+                    speculation <strong>becomes</strong> the building mechanism. Trading activity funds missions. 
+                    Market dynamics create resources. But success requires careful design—most token economies 
+                    fail to achieve sustainable equilibrium.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 3: Technical Architecture -->
+    <section class="chapter">
+        <div class="container">
+            <div class="story-content">
+                <div class="chapter-header">
+                    <p class="chapter-number">CHAPTER 3</p>
+                    <h2 class="chapter-title">The Architecture</h2>
+                    <p class="chapter-intro">
+                        Built on Solana because speed matters. Every trade captured. 
+                        Every fee routed. Every KPI verified.
+                    </p>
+                </div>
+
+                <div class="fee-flow">
+                    <div class="fee-component">
+                        <div class="fee-percentage">Flexible</div>
+                        <div class="fee-label">Treasury/Rewards</div>
+                        <div class="fee-desc">Mission decides the split</div>
+                    </div>
+                    <div class="fee-component">
+                        <div class="fee-percentage">Adaptive</div>
+                        <div class="fee-label">Burns</div>
+                        <div class="fee-desc">Success triggers deflation</div>
+                    </div>
+                    <div class="fee-component">
+                        <div class="fee-percentage">Sustainable</div>
+                        <div class="fee-label">Liquidity</div>
+                        <div class="fee-desc">Healthy trading dynamics</div>
+                    </div>
+                </div>
+
+
+
+                <p style="margin-top: 3rem;">
+                    <strong>The key innovation: flexibility</strong>. Community missions can run with zero treasury, 
+                    channeling everything to participants. Organizations can maintain treasuries for research and 
+                    operations. The protocol adapts to the mission's needs, not the other way around.
+                </p>
+                
+                <p style="margin-top: 1.5rem;">
+                    <strong>Critical requirement:</strong> All KPIs must be trackable onchain through smart contracts. 
+                    This is hard but essential. We're building infrastructure to make real-world actions verifiable 
+                    on the blockchain.
+                </p>
+                
+
+                
+                <p style="margin-top: 1.5rem;">
+                    Research shows that creating self-sustaining token economies is extremely challenging. 
+                    According to formal verification studies, "the human mind cannot fully understand all 
+                    the factors and probable scenarios of token behaviour" [<a href="https://jbba.scholasticahq.com/article/32985-creation-of-a-self-sustaining-token-economy.pdf" style="color: var(--green);">1</a>]. 
+                    That's why REFLEX emphasizes modeling and community-driven development.
+                </p>
+                
+                <p style="margin-top: 1.5rem; font-style: italic; color: var(--gray);">
+                    Note: This is a conceptual framework. Specific implementations, fee structures, and 
+                    technical details will be developed openly on GitHub.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 4: Mission Examples & Real Work -->
+    <section id="examples" class="chapter">
+        <div class="container">
+            <div class="story-content">
+                <div class="chapter-header">
+                    <p class="chapter-number">CHAPTER 4</p>
+                    <h2 class="chapter-title">Missions & Rewards</h2>
+                    <p class="chapter-intro">
+                        Mission tokens that both <strong>fund real work</strong> and <strong>produce real results</strong>.
+                    </p>
+                </div>
+                
+                <div style="background: linear-gradient(90deg, rgba(0,102,0,0.05) 0%, rgba(0,102,0,0) 100%); border-left: 3px solid var(--green); padding: 1.5rem; margin: 2rem 0;">
+                    <p style="font-weight: 500; margin-bottom: 0.5rem;">
+                        <strong>The key:</strong> Missions fund actual work. Not just speculation - real jobs pushing real progress.
+                    </p>
+                    <p style="font-style: italic; color: var(--gray); margin-bottom: 0;">
+                        <strong>Challenge:</strong> All contributions must be trackable onchain. When solved, this unlocks massive work opportunities.
+                    </p>
+                </div>
+                
+                <h3 style="margin-top: 3rem; margin-bottom: 1.5rem; font-size: 1.4rem;">Who Can Contribute & Earn</h3>
+                
+                <div class="grid-4col">
+                    <div class="work-card">
+                        <h3 class="work-role">DEVELOPERS</h3>
+                        <p class="work-desc">Build tools → earn from reward pool</p>
+                    </div>
+                    <div class="work-card">
+                        <h3 class="work-role">COMMUNITIES</h3>
+                        <p class="work-desc">Spread awareness → get paid for growth</p>
+                    </div>
+                    <div class="work-card">
+                        <h3 class="work-role">OPERATORS</h3>
+                        <p class="work-desc">Run infrastructure → rewards for uptime</p>
+                    </div>
+                    <div class="work-card">
+                        <h3 class="work-role">CREATORS</h3>
+                        <p class="work-desc">Make content → paid for engagement</p>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.4rem;">Illustrative Mission Examples</h3>
+                
+                <div style="text-align: center; margin-bottom: 1rem; font-style: italic; color: var(--gray);">
+                    <p>The following are purely <strong>illustrative examples</strong> to demonstrate potential applications.<br>These are not real projects or tokens.</p>
+                </div>
+
+                <div class="grid-3col">
+                    <div class="mission-card">
+                        <p class="mission-token">EXAMPLE: $BUILD</p>
+                        <p class="mission-type">OPEN SOURCE</p>
+                        <p class="mission-desc">
+                            Hypothetical: Trading fees fund developers. Merged pull requests trigger token burns.
+                        </p>
+                    </div>
+                    <div class="mission-card">
+                        <p class="mission-token">EXAMPLE: $GREEN</p>
+                        <p class="mission-type">CLIMATE ACTION</p>
+                        <p class="mission-desc">
+                            Hypothetical: Token speculation funds carbon removal. Verified offsets burn tokens.
+                        </p>
+                    </div>
+                    <div class="mission-card">
+                        <p class="mission-token">EXAMPLE: $LEARN</p>
+                        <p class="mission-type">EDUCATION</p>
+                        <p class="mission-desc">
+                            Hypothetical: Trading activity funds scholarships. Completed courses trigger burns.
+                        </p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 3rem;">
+                    The pattern is universal: capture attention, channel it into work, reward success with deflation. 
+                    Whether saving oceans or shipping code, the mechanism remains elegant. <strong>Speculation becomes 
+                    fuel for construction</strong>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 5: Reality Check -->
+    <section class="chapter">
+        <div class="container">
+            <div class="story-content">
+                <div class="chapter-header">
+                    <p class="chapter-number">CHAPTER 5</p>
+                    <h2 class="chapter-title">The Reality Check</h2>
+                    <p class="chapter-intro">
+                        Most tokens fail. This framework improves odds but doesn't guarantee success.
+                    </p>
+                </div>
+
+                <div class="diagram">
+                    <p class="diagram-title">CHALLENGES & SOLUTIONS</p>
+                    
+                    <p style="font-size: 1.25rem; margin-bottom: 2rem;">
+                        <strong>Death Spiral:</strong> Price drops → less attention → fewer fees.<br>
+                        <span class="data green">Solution:</span> Strong initial community + real utility beyond speculation.
+                    </p>
+                    
+                    <p style="font-size: 1.25rem; margin-bottom: 2rem;">
+                        <strong>Mission Completion:</strong> What happens when goals are met?<br>
+                        <span class="data green">Solution:</span> Evolving missions. Phase 1 → Phase 2 → Maintenance mode.
+                    </p>
+                    
+                    <p style="font-size: 1.25rem;">
+                        <strong>Onchain Tracking Challenge:</strong> Everything must be verifiable onchain.<br>
+                        <span class="data blue">Current Limitation:</span> Many real-world actions are hard to track. We need better oracles.
+                    </p>
+                </div>
+
+                <p style="margin-top: 3rem; text-align: center; font-size: 1.25rem; font-weight: 500;">
+                    Most tokens fail. This framework improves odds but doesn't guarantee success.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2 class="cta-title">Ready to make attention productive?</h2>
+            <p class="cta-subtitle">
+                Launch your mission on REFLEX. Turn memes into meaning.
+            </p>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-primary">VIEW ON GITHUB</a>
+                <a href="#" class="btn btn-secondary">JOIN DISCUSSION</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">
+                REFLEX FRAMEWORK — A RESEARCH PROJECT BY 
+                <a href="https://sculpt.fun" target="_blank" style="color: var(--green); border-bottom: 1px solid var(--green);">SCULPT</a>
+            </p>
+            <p style="font-family: var(--mono); font-size: 0.65rem; color: var(--light-gray); margin-top: 0.5rem; letter-spacing: 0.05em;">
+                CONCEPTUAL DESIGN — IMPLEMENTATION ON GITHUB
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Mode Toggle Functionality
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const body = document.body;
+
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const mode = button.dataset.mode;
+                
+                // Update button states
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Remove all mode classes
+                body.classList.remove('summary-mode', 'spx-mode');
+                
+                // Add appropriate mode class
+                if (mode === 'summary') {
+                    body.classList.add('summary-mode');
+                } else if (mode === 'spx') {
+                    body.classList.add('spx-mode');
+                }
+            });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .mission-card, .fee-component, .quote').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+    </script>
+</body>
+</html>
